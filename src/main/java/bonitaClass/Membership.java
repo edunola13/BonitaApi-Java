@@ -1,6 +1,10 @@
 package bonitaClass;
 
-public class Membership {
+public class Membership implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private long userId;
 	private Role role;
 	private Group group;

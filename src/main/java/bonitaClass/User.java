@@ -2,11 +2,16 @@ package bonitaClass;
 
 import java.util.List;
 
-public class User {
+public class User implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private long id;
 	private String firstName;
 	private String lastName;
 	private String userName;
+	private Boolean enabled;
 	private List<Membership> memberships;
 	
 	public User(){
@@ -43,6 +48,14 @@ public class User {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public Boolean getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	public List<Membership> getMemberships() {

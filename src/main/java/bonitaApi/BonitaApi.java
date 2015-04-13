@@ -18,7 +18,11 @@ import bonitaClass.Role;
 import bonitaClass.Task;
 import bonitaClass.User;
 
-public class BonitaApi {
+public class BonitaApi implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private BonitaProxy proxy;
 	private Boolean correctLogin= false;
 	private User user;
@@ -40,6 +44,33 @@ public class BonitaApi {
 		}
 	}
 	
+	/*
+	 * Getters y Setters	
+	 */
+	
+	public Boolean getCorrectLogin() {
+		return correctLogin;
+	}
+
+	public void setCorrectLogin(Boolean correctLogin) {
+		this.correctLogin = correctLogin;
+	}
+
+	public User getUser() {
+		return user;
+	}
+	
+	public void setUser(User user) {
+		this.user = user;
+	}
+	
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
 	
 	public String getCookie(){
 		return this.proxy.getCookieHeader();
@@ -55,6 +86,22 @@ public class BonitaApi {
 	
 	public void setServerUrl(String serverUrl){
 		this.proxy.setServerUrl(serverUrl);
+	}
+	
+	public String getUserName() {
+		return proxy.getUserName();
+	}
+
+	public void setUserName(String userName) {
+		this.setUserName(userName);
+	}
+
+	public String getPassword() {
+		return proxy.getPassword();
+	}
+
+	public void setPassword(String password) {
+		this.setPassword(password);
 	}
 	
 	/*
@@ -108,7 +155,7 @@ public class BonitaApi {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Boolean desactivateUser(long id){
+	public Boolean deactivateUser(long id){
 		String url= "API/identity/user/"+Long.toString(id);
 		String metodo= "PUT";
 		JSONObject json= new JSONObject();
@@ -299,19 +346,34 @@ public class BonitaApi {
 		return this.mapearProfiles(resultado);
 	}
 	
+	public Boolean hasProfile(long userId, String profileName){
+		String url= "API/userXP/profile?f=user_id=" + Long.toString(userId);
+		String metodo= "GET";
+		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
+		List<Profile> profiles= this.mapearProfiles(resultado);
+		Boolean has= false;
+		for(Profile profile : profiles){
+			if(profile.getName().equals(profileName)){
+				has=true;
+				break;
+			}
+		}
+		return has;
+	}
+	
 	/*
 	 * SECCION DEPLOYED PROCESSES - APPLICATIONS
 	 */
 	
 	public List<Process> deployedProcesses(){
-		String url= "API/bpm/process?p=0&c=1000";
+		String url= "API/bpm/process?p=0&c=1000&o=displayName%20ASC";
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		return this.mapearProcesses(resultado);
 	}
 	
 	public Process deployedProcess(long processId){
-		String url= "API/bpm/process?p=0&c=1000";
+		String url= "API/bpm/process?p=0&c=1000&o=displayName%20ASC";
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		
@@ -326,15 +388,71 @@ public class BonitaApi {
 	}
 	
 	public List<Process> deployedProccessForUser(long userId){
-		String url= "API/bpm/process?p=0&c=1000&f=user_id=" + Long.toString(userId);
+		String url= "API/bpm/process?p=0&c=1000&o=displayName%20ASC&f=user_id=" + Long.toString(userId);
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		return this.mapearProcesses(resultado);
-	}	
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Boolean disableProcess(long processId){
+		String url= "API/bpm/process/"+Long.toString(processId);
+		String metodo= "PUT";
+		JSONObject json= new JSONObject();
+		json.put("activationState", "DISABLED");
+		String resultado= this.proxy.enviarPeticion(url, metodo, json.toJSONString(), "application/json");
+		if(! resultado.equals("error")){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Boolean enableProcess(long processId){
+		String url= "API/bpm/process/"+Long.toString(processId);
+		String metodo= "PUT";
+		JSONObject json= new JSONObject();
+		json.put("activationState", "ENABLED");
+		String resultado= this.proxy.enviarPeticion(url, metodo, json.toJSONString(), "application/json");
+		if(! resultado.equals("error")){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public Boolean deleteProcess(long processId){
+		String url= "API/bpm/process/"+Long.toString(processId);
+		String metodo= "DELETE";
+		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
+		if(! resultado.equals("error")){
+			return true;
+		}else{
+			return false;
+		}
+	}
 	
 	/*
 	 * SECCIONES CASES
 	 */
+	public List<Case> cases(int page, int amountPerPage){
+		String url= "API/bpm/case?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage);
+		String metodo= "GET";
+		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
+		
+		return this.mapearCases(resultado);
+	}
+	
+	public Boolean hasPreviewPageCases(int actualPage, int amountPerPage){
+		return this.previewPage(actualPage, amountPerPage);
+	}
+	
+	public Boolean hasNextPageCases(int actualPage, int amountPerPage){
+		List<Case> cases= this.cases(actualPage + 1, amountPerPage);
+		return (cases.size() > 0);
+	}
+	
 	
 	public List<Case> cases(long userId, int page, int amountPerPage){
 		String url= "API/bpm/case?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=user_id=" + Long.toString(userId);
@@ -363,9 +481,54 @@ public class BonitaApi {
 		return this.mapearCase(resultado);
 	}
 	
+	public Boolean deleteCase(long caseId){
+		String url= "API/bpm/case/"+Long.toString(caseId);
+		String metodo= "DELETE";
+		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
+		if(! resultado.equals("error")){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public List<Case> archivedCases(long userId, int page, int amountPerPage){
+		String url= "API/bpm/archivedCase?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=user_id=" + Long.toString(userId);
+		String metodo= "GET";
+		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
+		
+		return this.mapearCases(resultado);
+	}
+	
+	public Boolean hasPreviewPageArchivedCases(long userId, int actualPage, int amountPerPage){
+		return this.previewPage(actualPage, amountPerPage);
+	}
+	
+	public Boolean hasNextPageArchivedCases(long userId, int actualPage, int amountPerPage){
+		List<Case> cases= this.archivedCases(userId, actualPage + 1, amountPerPage);
+		return (cases.size() > 0);
+	}
+	
 	/*
 	 * SECCION TASKS
 	 */
+	public List<Task> tasks(int page, int amountPerPage){
+		String url= "API/bpm/humanTask?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage);
+		String metodo= "GET";
+		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
+		
+		return this.mapearTasks(resultado);
+	}
+	
+	public Boolean hasPreviewPageTasks(int actualPage, int amountPerPage){
+		return this.previewPage(actualPage, amountPerPage);
+	}
+	
+	public Boolean hasNextPageTasks(int actualPage, int amountPerPage){
+		List<Task> tasks= this.tasks(actualPage + 1, amountPerPage);
+		return (tasks.size() > 0);
+	}
+	
 	
 	public List<Task> tasks(long userId, int page, int amountPerPage){
 		String url= "API/bpm/humanTask?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=state=ready&f=user_id=" + Long.toString(userId);
@@ -384,6 +547,15 @@ public class BonitaApi {
 		return (tasks.size() > 0);
 	}
 	
+	public Task task(long taskId){
+		String url= "API/bpm/humanTask/" + Long.toString(taskId);
+		String metodo= "GET";
+		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
+		
+		return this.mapearTask(resultado);
+	}
+	
+	@Deprecated
 	public Task task(long userId, long taskId){
 		String url= "API/bpm/humanTask?p=0&c=10000&f=user_id=" + Long.toString(userId);
 		String metodo= "GET";
@@ -426,35 +598,25 @@ public class BonitaApi {
 			return false;
 		}
 	}
+	
+	public List<Task> archivedHumanTask(long userId, int page, int amountPerPage){
+		String url= "API/bpm/archivedHumanTask?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=state=ready&f=user_id=" + Long.toString(userId);
+		String metodo= "GET";
+		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		
-	/*
-	 * Getters y Setters	
-	 */
-	
-	public Boolean getCorrectLogin() {
-		return correctLogin;
-	}
-
-	public void setCorrectLogin(Boolean correctLogin) {
-		this.correctLogin = correctLogin;
-	}
-
-	public User getUser() {
-		return user;
+		return this.mapearTasks(resultado);
 	}
 	
-	public void setUser(User user) {
-		this.user = user;
+	public Boolean hasPreviewPageArchivedHumanTask(long userId, int actualPage, int amountPerPage){
+		return this.previewPage(actualPage, amountPerPage);
 	}
 	
-	public String getVersion() {
-		return version;
+	public Boolean hasNextPageArchivedHumanTask(long userId, int actualPage, int amountPerPage){
+		List<Task> tasks= this.archivedHumanTask(userId, actualPage + 1, amountPerPage);
+		return (tasks.size() > 0);
 	}
-
-	public void setVersion(String version) {
-		this.version = version;
-	}
-
+		
+	
 	/*
 	 * METODOS PRIVADOS
 	 */
@@ -510,6 +672,7 @@ public class BonitaApi {
 				user.setFirstName((String) userJson.get("firstname"));
 				user.setLastName((String) userJson.get("lastname"));
 				user.setUserName((String) userJson.get("userName"));
+				user.setEnabled(Boolean.valueOf((String) userJson.get("enabled")));
 				users.add(user);
 			}
 		} catch (ParseException e) {
@@ -528,6 +691,7 @@ public class BonitaApi {
 			user.setFirstName((String) json.get("firstname"));
 			user.setLastName((String) json.get("lastname"));
 			user.setUserName((String) json.get("userName"));
+			user.setEnabled(Boolean.valueOf((String) json.get("enabled")));
 			return user;
 		}catch(Exception e){
 			return null;
@@ -693,6 +857,7 @@ public class BonitaApi {
 				task.setPriority((String) userJson.get("priority"));				
 				task.setState((String) userJson.get("state"));
 				task.setDueDate((String) userJson.get("dueDate"));
+				task.setExecutedDate((String) userJson.get("reached_state_date"));
 				task.setExecutedBy(Long.parseLong((String)userJson.get("executedBy")));				
 				task.setCaseId(Long.parseLong((String)userJson.get("caseId")));
 				task.setActorId(Long.parseLong((String)userJson.get("actorId")));
@@ -709,5 +874,37 @@ public class BonitaApi {
 		}
 		
 		return tasks;
+	}
+	
+	private Task mapearTask(String jsonString){
+		try{
+			JSONParser par= new JSONParser();  		
+			JSONObject json= (JSONObject) par.parse(jsonString);
+			
+			Task task= new Task();
+			task.setId(Long.parseLong((String)json.get("id")));
+			task.setName((String) json.get("name"));
+			task.setDescription((String) json.get("description"));
+			task.setDisplayName((String) json.get("displayName"));
+			task.setDisplayDescription((String) json.get("displayDescription"));
+			task.setType((String) json.get("type"));
+			task.setPriority((String) json.get("priority"));				
+			task.setState((String) json.get("state"));
+			task.setDueDate((String) json.get("dueDate"));
+			task.setExecutedDate((String) json.get("reached_state_date"));
+			task.setExecutedBy(Long.parseLong((String)json.get("executedBy")));				
+			task.setCaseId(Long.parseLong((String)json.get("caseId")));
+			task.setActorId(Long.parseLong((String)json.get("actorId")));
+			long assignedId= 0;
+			if(! ((String)json.get("assigned_id")).isEmpty()){
+				assignedId= Long.parseLong((String)json.get("assigned_id"));
+			}
+			task.setAssignedId(assignedId);
+			task.setProcess(this.deployedProcess(Long.parseLong((String)json.get("processId"))));
+			return task;
+		}catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

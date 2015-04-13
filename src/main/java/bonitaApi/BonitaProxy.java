@@ -10,7 +10,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class BonitaProxy {
+public class BonitaProxy implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String serverUrl= "http://localhost:8080/bonita/";
 	
 	private URL url;

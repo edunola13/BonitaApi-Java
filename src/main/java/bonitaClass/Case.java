@@ -3,7 +3,11 @@ package bonitaClass;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Case {
+public class Case implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private long id;
 	private String state;
 	private Date beginDate;

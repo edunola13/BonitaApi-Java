@@ -4,7 +4,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class Task {
+public class Task implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private long id;
 	private String name;
 	private String description;
@@ -14,6 +18,7 @@ public class Task {
 	private String priority;
 	private String state;
 	private Date dueDate;
+	private Date executedDate;
 	private long executedBy;
 	private long caseId;
 	private long actorId;
@@ -108,6 +113,26 @@ public class Task {
 		}
 	}
 	
+	public Date getExecutedDate() {
+		return executedDate;
+	}
+	
+	public String getExecutedDateString(){
+		String dateString = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(this.getExecutedDate());
+		return dateString;
+	}
+
+	public void setExecutedDate(String executedDate) {
+		if(! executedDate.equals("")){
+			try{
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+				this.executedDate = sdf.parse(executedDate);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+	}
+
 	public long getExecutedBy() {
 		return executedBy;
 	}

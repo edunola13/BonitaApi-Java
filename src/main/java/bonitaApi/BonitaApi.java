@@ -600,7 +600,7 @@ public class BonitaApi implements java.io.Serializable{
 	}
 	
 	public List<Task> archivedHumanTask(long userId, int page, int amountPerPage){
-		String url= "API/bpm/archivedHumanTask?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=state=ready&f=user_id=" + Long.toString(userId);
+		String url= "API/bpm/archivedHumanTask?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=assigned_id=" + Long.toString(userId);
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		

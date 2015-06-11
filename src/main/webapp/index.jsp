@@ -7,7 +7,7 @@
 <%-- <%BonitaProxy pro= new BonitaProxy();%> --%>
 <%-- <%=pro.autentificarse("juan", "juan")%> --%>
 
-<%BonitaApi con= new BonitaApi("http://server200364b:8080/bonita/","compras", "bpm");
+<%BonitaApi con= new BonitaApi("http://server200364b:8080/bonita/","edu", "edu");
  User user= con.user("compras");
  List<bonitaClass.Process> precesos= con.deployedProccessForUser(user.getId()); %>
  <%= con.getCorrectLogin() %>
@@ -48,13 +48,15 @@
 <!-- 	<br/> -->
 <%-- <%} %> --%>
 
-<%-- <%=con.role("cliente").getName() %> --%>
+<%=con.role("Usuario").getName() %>
 
 <%-- <%List<Role> roles= con.roles(0,100);%> --%>
 <%-- <%for ( Role role : roles ) { %> --%>
 <%-- 	<%=role.getId() %> --%>
 <%-- 	<%=role.getName() %> --%>
 <%-- <%} %> --%>
+
+<%=con.group("Admin").getName() %>
 
 <%-- <%List<Group> groups= con.groups(0, 100);%> --%>
 <%-- <%for ( Group group : groups ) { %> --%>

@@ -248,12 +248,14 @@ public class BonitaApi implements java.io.Serializable{
 	}
 	
 	public Role role(String name){
+		String url= "API/identity/role?f=name=" + name;
+		String metodo= "GET";
+		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
+		
+		List<Role> roles= this.mapearRoles(resultado);
 		Role role= null;
-		for(Role roleList: this.roles(0,1000)){
-			if(roleList.getName().equals(name)){
-				role= roleList;
-				break;
-			}
+		if(roles.size() > 0){
+			role= roles.get(0);
 		}
 		return role;
 	}
@@ -286,13 +288,15 @@ public class BonitaApi implements java.io.Serializable{
 		return group;
 	}
 	
-	public Group group(String name){		
+	public Group group(String name){
+		String url= "API/identity/group?f=name=" + name;
+		String metodo= "GET";
+		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
+		
+		List<Group> groups= this.mapearGroups(resultado);
 		Group group= null;
-		for(Group groupList: this.groups(0,1000)){
-			if(groupList.getName().equals(name)){
-				group= groupList;				
-				break;
-			}
+		if(groups.size() > 0){
+			group= groups.get(0);
 		}
 		return group;
 	}

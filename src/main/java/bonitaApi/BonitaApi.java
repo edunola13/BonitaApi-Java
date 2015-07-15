@@ -44,6 +44,13 @@ public class BonitaApi implements java.io.Serializable{
 		}
 	}
 	
+	/**
+	 * Logout 
+	 */
+	public Boolean logout(){
+		return this.proxy.logout();
+	}
+	
 	/*
 	 * Getters y Setters	
 	 */

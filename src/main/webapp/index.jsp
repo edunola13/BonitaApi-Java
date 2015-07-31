@@ -7,16 +7,16 @@
 <%-- <%BonitaProxy pro= new BonitaProxy();%> --%>
 <%-- <%=pro.autentificarse("juan", "juan")%> --%>
 
-<%BonitaApi con= new BonitaApi("http://server200364b:8080/bonita/","edu", "edu");
- User user= con.user("compras");
- List<bonitaClass.Process> precesos= con.deployedProccessForUser(user.getId()); %>
+<%BonitaApi con= new BonitaApi("6.5","http://localhost:8080/bonita/","Fede22", "Fede22");
+ //User user= con.user("compras");
+ //List<bonitaClass.Process> precesos= con.deployedProccessForUser(con.actualUser().getId()); %>
  <%= con.getCorrectLogin() %>
 <%--  <%for ( bonitaClass.Process preceso : precesos ) { %> --%>
 <%-- 	<%=preceso.getVersion() %> --%>
 <%-- 	<%=preceso.getName() %> --%>
 <%-- <%} %> --%>
  
-<%-- <%List<Case> cases= con.cases(user.getId(),0,100);%> --%>
+<%-- <%List<Case> cases= con.cases(con.actualUser().getId(),0,100);%> --%>
 <%-- <%for ( Case caso : cases ) { %> --%>
 <%-- 	<%=caso.getId() %> --%>
 <%-- 	<%=caso.getProcess().getId() %> --%>
@@ -37,8 +37,7 @@
 
 <%-- <%= user.getId() %> --%>
 
-<%-- <%List<Task> tasks= con.tasks(user.getId(),0,100);%> --%>
-<%-- <%= user.getId() %> --%>
+<%-- <%List<Task> tasks= con.archivedHumanTask(con.actualUser().getId(),0,100, true, "Ta");%> --%>
 <%-- <%for ( Task task : tasks ) { %> --%>
 <%-- 	<%=task.getId() %> --%>
 <%-- 	<%=task.getProcess().getName() %> --%>
@@ -48,7 +47,7 @@
 <!-- 	<br/> -->
 <%-- <%} %> --%>
 
-<%=con.role("Usuario").getName() %>
+<%-- <%=con.role("member").getName() %> --%>
 
 <%-- <%List<Role> roles= con.roles(0,100);%> --%>
 <%-- <%for ( Role role : roles ) { %> --%>
@@ -56,7 +55,7 @@
 <%-- 	<%=role.getName() %> --%>
 <%-- <%} %> --%>
 
-<%=con.group("Admin").getName() %>
+<%--=con.group("Admin").getName() --%>
 
 <%-- <%List<Group> groups= con.groups(0, 100);%> --%>
 <%-- <%for ( Group group : groups ) { %> --%>
@@ -64,14 +63,14 @@
 <%-- 	<%=group.getName() %> --%>
 <%-- <%} %> --%>
 
-<%-- <%List<Membership> memberships= con.memberships(103L);%> --%>
+<%-- <%List<Membership> memberships= con.memberships(con.actualUser().getId(), 0, 100);%> --%>
 <%-- <%for ( Membership membership : memberships ) { %> --%>
 <%-- 	<%=membership.getUserId() %> --%>
 <%-- 	<%=membership.getRole().getName() %> --%>
 <%-- 	<%=membership.getGroup().getName() %> --%>
 <%-- <%} %> --%>
 
-<%-- <%= con.createUser("Fede22", "Fede22", "Fede22", "Fede22", "Fede22") %> --%>
+<%-- <%= con.createUser("Fede22", "Fede22", "Fede22", "Fede22", "Fede22") %>--%>
 
 <%-- <%= con.addMembership(12L, 12L, 12L) %> --%>
 

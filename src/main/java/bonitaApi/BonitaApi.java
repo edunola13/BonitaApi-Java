@@ -26,19 +26,20 @@ public class BonitaApi implements java.io.Serializable{
 	private BonitaProxy proxy;
 	private Boolean correctLogin= false;
 	private User user;
-	private String version= "6.2";
+	private String version= "6.2";						//Opciones 6.1-6.2-6.3-6.4-6.5
 	
 	public BonitaApi(){
 		this.proxy= new BonitaProxy();
 	}
 	
-	public BonitaApi(String serverUrl, String userName, String password){
+	public BonitaApi(String version, String serverUrl, String userName, String password){
+		this.version= version;
 		this.proxy= new BonitaProxy(serverUrl);
 		this.proxy.setUserName(userName);
 		this.proxy.setPassword(password);
 		if(! this.proxy.autentificarse()){
 			this.correctLogin= false;
-			System.out.println("La autentificacion hacia el servidor bonita ha fallado. Controle el servidor y el usuario y password");
+			System.out.println("La autentificacion hacia el servidor bonita ha fallado. Controle el servidor, el usuario y password");
 		}else{
 			this.correctLogin= true;
 		}
@@ -115,6 +116,15 @@ public class BonitaApi implements java.io.Serializable{
 	 * SECCION USERS-PROFILES-ROLES-GROUPS-MEMBERSHIPS
 	 */
 	
+	/**
+	 * Create a new User
+	 * @param userName
+	 * @param password
+	 * @param passwordConfirm
+	 * @param firstName
+	 * @param lastName
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public User createUser(String userName, String password, String passwordConfirm, String firstName, String lastName){
 		String url= "API/identity/user/";
@@ -130,6 +140,11 @@ public class BonitaApi implements java.io.Serializable{
 		return this.mapearUser(resultado);
 	}
 	
+	/**
+	 * Delete a User with Id
+	 * @param id
+	 * @return
+	 */
 	public Boolean deleteUser(long id){
 		String url= "API/identity/user/"+Long.toString(id);
 		String metodo= "DELETE";
@@ -141,6 +156,17 @@ public class BonitaApi implements java.io.Serializable{
 		}
 	}
 	
+	/**
+	 * Update a User with Id
+	 * @param id
+	 * @param userName
+	 * @param password
+	 * @param passwordConfirm
+	 * @param firstName
+	 * @param lastName
+	 * @param enabled
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public Boolean updateUser(long id, String userName, String password, String passwordConfirm, String firstName, String lastName, Boolean enabled){
 		String url= "API/identity/user/"+Long.toString(id);
@@ -161,6 +187,11 @@ public class BonitaApi implements java.io.Serializable{
 		}
 	}
 	
+	/**
+	 * Deactivate a User with Id
+	 * @param id
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public Boolean deactivateUser(long id){
 		String url= "API/identity/user/"+Long.toString(id);
@@ -175,6 +206,11 @@ public class BonitaApi implements java.io.Serializable{
 		}
 	}
 	
+	/**
+	 * Activate a User with Id
+	 * @param id
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public Boolean activeUser(long id){
 		String url= "API/identity/user/"+Long.toString(id);
@@ -189,23 +225,69 @@ public class BonitaApi implements java.io.Serializable{
 		}
 	}
 	
-	public List<User> users(int page, int amountPerPage){
-		String url= "API/identity/user?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage);
+	/**
+	 * Paged User list ordered by lastname
+	 * @param page
+	 * @param amountPerPage
+	 * @return
+	 */
+	public List<User> users(int page, int amountPerPage, Boolean orderAsc, String search){
+		String order= "ASC";
+		if(!orderAsc) order= "DESC";
+		String url= "API/identity/user?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&o=lastname%20" + order + "&s=" + search;
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		
 		return this.mapearUsers(resultado);
 	}
 	
-	public Boolean hasPreviewPageUsers(int actualPage, int amountPerPage){
-		return this.previewPage(actualPage, amountPerPage);
+	/**
+	 * Paged User list ordered by lastname
+	 * @param page
+	 * @param amountPerPage
+	 * @return
+	 */
+	public List<User> users(int page, int amountPerPage){
+		return users(page, amountPerPage, true, "");
 	}
 	
+	/**
+	 * Return if User list has previous page
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
+	public Boolean hasPreviousPageUsers(int actualPage, int amountPerPage){
+		return this.PreviousPage(actualPage, amountPerPage);
+	}
+	
+	/**
+	 * Return if User list has next page
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
+	public Boolean hasNextPageUsers(int actualPage, int amountPerPage, Boolean orderAsc, String search){
+		List<User> users= this.users(actualPage + 1, amountPerPage, orderAsc, search);
+		return (users.size() > 0);
+	}
+	
+	/**
+	 * Return if User list has next page
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
 	public Boolean hasNextPageUsers(int actualPage, int amountPerPage){
 		List<User> users= this.users(actualPage + 1, amountPerPage);
 		return (users.size() > 0);
 	}
 	
+	/**
+	 * Return a User with UserName
+	 * @param userName
+	 * @return
+	 */
 	public User user(String userName){
 		String url= "API/identity/user?f=userName=" + userName;
 		String metodo= "GET";
@@ -219,6 +301,10 @@ public class BonitaApi implements java.io.Serializable{
 		return user;
 	}
 	
+	/**
+	 * Return actual log User
+	 * @return
+	 */
 	public User actualUser(){
 		if(this.user == null){
 			this.user= this.user(this.proxy.getUserName());
@@ -226,23 +312,46 @@ public class BonitaApi implements java.io.Serializable{
 		return this.user;
 	}
 	
+	/**
+	 * Paged Role list ordered by displayName
+	 * @param page
+	 * @param amountPerPage
+	 * @return
+	 */
 	public List<Role> roles(int page, int amountPerPage){
-		String url= "API/identity/role?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage);
+		String url= "API/identity/role?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&o=displayName%20ASC";
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		
 		return this.mapearRoles(resultado);
 	}
 	
-	public Boolean hasPreviewPageRoles(int actualPage, int amountPerPage){
-		return this.previewPage(actualPage, amountPerPage);
+	/**
+	 * Return if Role list has previous page
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
+	public Boolean hasPreviousPageRoles(int actualPage, int amountPerPage){
+		return this.PreviousPage(actualPage, amountPerPage);
 	}
 	
+	/**
+	 * Return if Role list has next page
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
 	public Boolean hasNextPageRoles(int actualPage, int amountPerPage){
 		List<Role> roles= this.roles(actualPage + 1, amountPerPage);
 		return (roles.size() > 0);
 	}
 	
+	/**
+	 * Return Role with Id
+	 * @param id
+	 * @return
+	 */
 	public Role role(long id){
 		Role role= null;
 		for(Role roleList: this.roles(0,1000)){
@@ -254,6 +363,11 @@ public class BonitaApi implements java.io.Serializable{
 		return role;
 	}
 	
+	/**
+	 * Return Role with name
+	 * @param name
+	 * @return
+	 */
 	public Role role(String name){
 		String url= "API/identity/role?f=name=" + name;
 		String metodo= "GET";
@@ -267,23 +381,46 @@ public class BonitaApi implements java.io.Serializable{
 		return role;
 	}
 	
+	/**
+	 * Paged Group list ordered by displayName
+	 * @param page
+	 * @param amountPerPage
+	 * @return
+	 */
 	public List<Group> groups(int page, int amountPerPage){
-		String url= "API/identity/group?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage);
+		String url= "API/identity/group?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&o=displayName%20ASC";
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		
 		return this.mapearGroups(resultado);
 	}
 	
-	public Boolean hasPreviewPageGroups(int actualPage, int amountPerPage){
-		return this.previewPage(actualPage, amountPerPage);
+	/**
+	 * Return if Group list has previous page
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
+	public Boolean hasPreviousPageGroups(int actualPage, int amountPerPage){
+		return this.PreviousPage(actualPage, amountPerPage);
 	}
 	
+	/**
+	 * Return if Group has next page
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
 	public Boolean hasNextPageGroups(int actualPage, int amountPerPage){
 		List<Group> groups= this.groups(actualPage + 1, amountPerPage);
 		return (groups.size() > 0);
 	}
 	
+	/**
+	 * Return Group with Id
+	 * @param id
+	 * @return
+	 */
 	public Group group(long id){
 		Group group= null;
 		for(Group groupList: this.groups(0,1000)){
@@ -295,6 +432,11 @@ public class BonitaApi implements java.io.Serializable{
 		return group;
 	}
 	
+	/**
+	 * Return Group with Name
+	 * @param name
+	 * @return
+	 */
 	public Group group(String name){
 		String url= "API/identity/group?f=name=" + name;
 		String metodo= "GET";
@@ -308,6 +450,13 @@ public class BonitaApi implements java.io.Serializable{
 		return group;
 	}
 	
+	/**
+	 * Add a new Membership
+	 * @param userId
+	 * @param roleId
+	 * @param groupId
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public Boolean addMembership(long userId, long roleId, long groupId){
 		String url= "API/identity/membership/";
@@ -324,41 +473,87 @@ public class BonitaApi implements java.io.Serializable{
 		}
 	}
 	
+	/**
+	 * Memberships list of a User
+	 * @param userId
+	 * @param page
+	 * @param amountPerPage
+	 * @return
+	 */
 	public List<Membership> memberships(long userId, int page, int amountPerPage){
-		String url= "API/identity/membership?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=user_id=" + Long.toString(userId);
+		String url= "API/identity/membership?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=user_id=" + Long.toString(userId) + "&d=role_id&d=group_id";
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		
 		return this.mapearMemberships(resultado);
 	}
 	
-	public Boolean hasPreviewPageMemberships(long userId, int actualPage, int amountPerPage){
-		return this.previewPage(actualPage, amountPerPage);
+	/**
+	 * Return if Membership list has previous page
+	 * @param userId
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
+	public Boolean hasPreviousPageMemberships(long userId, int actualPage, int amountPerPage){
+		return this.PreviousPage(actualPage, amountPerPage);
 	}
 	
+	/**
+	 * Return if Membership list has next page
+	 * @param userId
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
 	public Boolean hasNextPageMemberships(long userId, int actualPage, int amountPerPage){
 		List<Membership> memberships= this.memberships(userId, actualPage + 1, amountPerPage);
 		return (memberships.size() > 0);
 	}
 	
+	/**
+	 * Profile list
+	 * @return
+	 */
 	public List<Profile> profiles(){
-		//String url= "API/portal/profile?p=0&c=100"; desde 6.3 para adelante
 		String url= "API/userXP/profile?p=0&c=100";
+		if(this.version != "6.1" && this.version != "6.2"){
+			url= "API/portal/profile?p=0&c=100";
+		}
+		
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		return this.mapearProfiles(resultado);
 	}
 	
+	/**
+	 * Profile list of a User
+	 * @param userId
+	 * @return
+	 */
 	public List<Profile> userProfiles(long userId){
-		//String url= "API/portal/profile?f=user_id=103"; desde 6.3 para adelante
 		String url= "API/userXP/profile?f=user_id=" + Long.toString(userId);
+		if(this.version != "6.1" && this.version != "6.2"){
+			url= "API/portal/profile?f=user_id=" + Long.toString(userId);
+		}
+		
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		return this.mapearProfiles(resultado);
 	}
 	
+	/**
+	 * Return if a User has a Profile
+	 * @param userId
+	 * @param profileName
+	 * @return
+	 */
 	public Boolean hasProfile(long userId, String profileName){
 		String url= "API/userXP/profile?f=user_id=" + Long.toString(userId);
+		if(this.version != "6.1" && this.version != "6.2"){
+			url= "API/portal/profile?f=user_id=" + Long.toString(userId);
+		}
+		
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		List<Profile> profiles= this.mapearProfiles(resultado);
@@ -376,6 +571,10 @@ public class BonitaApi implements java.io.Serializable{
 	 * SECCION DEPLOYED PROCESSES - APPLICATIONS
 	 */
 	
+	/**
+	 * Deployed Process list
+	 * @return
+	 */
 	public List<Process> deployedProcesses(){
 		String url= "API/bpm/process?p=0&c=1000&o=displayName%20ASC";
 		String metodo= "GET";
@@ -383,6 +582,11 @@ public class BonitaApi implements java.io.Serializable{
 		return this.mapearProcesses(resultado);
 	}
 	
+	/**
+	 * Return Deployed Process with Id
+	 * @param processId
+	 * @return
+	 */
 	public Process deployedProcess(long processId){
 		String url= "API/bpm/process?p=0&c=1000&o=displayName%20ASC";
 		String metodo= "GET";
@@ -398,6 +602,11 @@ public class BonitaApi implements java.io.Serializable{
 		return process;
 	}
 	
+	/**
+	 * Return Deployed Process for a User
+	 * @param userId
+	 * @return
+	 */
 	public List<Process> deployedProccessForUser(long userId){
 		String url= "API/bpm/process?p=0&c=1000&o=displayName%20ASC&f=user_id=" + Long.toString(userId);
 		String metodo= "GET";
@@ -405,6 +614,11 @@ public class BonitaApi implements java.io.Serializable{
 		return this.mapearProcesses(resultado);
 	}
 	
+	/**
+	 * Disable a Process with Id
+	 * @param processId
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public Boolean disableProcess(long processId){
 		String url= "API/bpm/process/"+Long.toString(processId);
@@ -419,6 +633,11 @@ public class BonitaApi implements java.io.Serializable{
 		}
 	}
 	
+	/**
+	 * Enable a Process with Id
+	 * @param processId
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public Boolean enableProcess(long processId){
 		String url= "API/bpm/process/"+Long.toString(processId);
@@ -433,6 +652,11 @@ public class BonitaApi implements java.io.Serializable{
 		}
 	}
 	
+	/**
+	 * Delete a Process with Id
+	 * @param processId
+	 * @return
+	 */
 	public Boolean deleteProcess(long processId){
 		String url= "API/bpm/process/"+Long.toString(processId);
 		String metodo= "DELETE";
@@ -447,41 +671,121 @@ public class BonitaApi implements java.io.Serializable{
 	/*
 	 * SECCIONES CASES
 	 */
-	public List<Case> cases(int page, int amountPerPage){
-		String url= "API/bpm/case?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage);
+	
+	/**
+	 * Paged Cases list ordered by name
+	 * @param page
+	 * @param amountPerPage
+	 * @return
+	 */
+	public List<Case> cases(int page, int amountPerPage, Boolean orderAsc, String search){
+		String order= "ASC";
+		if(!orderAsc)order= "DESC";
+		String url= "API/bpm/case?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&o=name%20" + order + "&s=" + search + "&d=processDefinitionId";
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		
 		return this.mapearCases(resultado);
 	}
 	
-	public Boolean hasPreviewPageCases(int actualPage, int amountPerPage){
-		return this.previewPage(actualPage, amountPerPage);
+	/**
+	 * Paged Cases list ordered by name
+	 * @param page
+	 * @param amountPerPage
+	 * @return
+	 */
+	public List<Case> cases(int page, int amountPerPage){
+		return this.cases(page, amountPerPage, true, "");
 	}
 	
+	/**
+	 * Return if Cases list has previous page
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
+	public Boolean hasPreviousPageCases(int actualPage, int amountPerPage){
+		return this.PreviousPage(actualPage, amountPerPage);
+	}
+	
+	/**
+	 * Return if Cases list has next page
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
 	public Boolean hasNextPageCases(int actualPage, int amountPerPage){
 		List<Case> cases= this.cases(actualPage + 1, amountPerPage);
 		return (cases.size() > 0);
 	}
 	
+	/**
+	 * Return if Cases list has next page
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
+	public Boolean hasNextPageCases(int actualPage, int amountPerPage, Boolean orderAsc, String search){
+		List<Case> cases= this.cases(actualPage + 1, amountPerPage, orderAsc, search);
+		return (cases.size() > 0);
+	}
 	
-	public List<Case> cases(long userId, int page, int amountPerPage){
-		String url= "API/bpm/case?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=user_id=" + Long.toString(userId);
+	/**
+	 * Paged Cases list for a User ordered by name
+	 * @param userId
+	 * @param page
+	 * @param amountPerPage
+	 * @return
+	 */
+	public List<Case> cases(long userId, int page, int amountPerPage, Boolean orderAsc, String search){
+		String order= "ASC";
+		if(!orderAsc)order= "DESC";
+		String url= "API/bpm/case?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=user_id=" + Long.toString(userId) + "&o=name%20" + order + "&s=" + search + "&d=processDefinitionId";
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		
 		return this.mapearCases(resultado);
 	}
 	
-	public Boolean hasPreviewPageCases(long userId, int actualPage, int amountPerPage){
-		return this.previewPage(actualPage, amountPerPage);
+	/**
+	 * Paged Cases list for a User ordered by name
+	 * @param userId
+	 * @param page
+	 * @param amountPerPage
+	 * @return
+	 */
+	public List<Case> cases(long userId, int page, int amountPerPage){
+		return this.cases(userId, page, amountPerPage, true, "");
 	}
 	
+	/**
+	 * Return if Cases list for a User has previous page
+	 * @param userId
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
+	public Boolean hasPreviousPageCases(long userId, int actualPage, int amountPerPage){
+		return this.PreviousPage(actualPage, amountPerPage);
+	}
+	
+	/**
+	 * Return if Cases list for a User has next page
+	 * @param userId
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
 	public Boolean hasNextPageCases(long userId, int actualPage, int amountPerPage){
 		List<Case> cases= this.cases(userId, actualPage + 1, amountPerPage);
 		return (cases.size() > 0);
 	}
 	
+	/**
+	 * Star a case of a Process Id
+	 * @param processId
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public Case startCase(long processId){		
 		String url= "API/bpm/case/";
@@ -492,6 +796,11 @@ public class BonitaApi implements java.io.Serializable{
 		return this.mapearCase(resultado);
 	}
 	
+	/**
+	 * Delete a Case (Instance of a Process)
+	 * @param caseId
+	 * @return
+	 */
 	public Boolean deleteCase(long caseId){
 		String url= "API/bpm/case/"+Long.toString(caseId);
 		String metodo= "DELETE";
@@ -503,61 +812,199 @@ public class BonitaApi implements java.io.Serializable{
 		}
 	}
 	
-	public List<Case> archivedCases(long userId, int page, int amountPerPage){
-		String url= "API/bpm/archivedCase?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=user_id=" + Long.toString(userId);
+	/**
+	 * Paged Archived Cases list of a User
+	 * @param userId
+	 * @param page
+	 * @param amountPerPage
+	 * @return
+	 */
+	public List<Case> archivedCases(long userId, int page, int amountPerPage, Boolean orderAsc, String search){
+		String order= "ASC";
+		if(!orderAsc)order= "DESC";
+		String url= "API/bpm/archivedCase?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=user_id=" + Long.toString(userId) + "&o=endDate%20" + order + "&s=" + search + "&d=processDefinitionId";
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		
 		return this.mapearCases(resultado);
 	}
 	
-	public Boolean hasPreviewPageArchivedCases(long userId, int actualPage, int amountPerPage){
-		return this.previewPage(actualPage, amountPerPage);
+	/**
+	 * Paged Archived Cases list of a User
+	 * @param userId
+	 * @param page
+	 * @param amountPerPage
+	 * @return
+	 */
+	public List<Case> archivedCases(long userId, int page, int amountPerPage){
+		return this.archivedCases(userId, page, amountPerPage, false, "");
 	}
 	
+	/**
+	 * Return if Archived Cases list has a previous page
+	 * @param userId
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
+	public Boolean hasPreviousPageArchivedCases(long userId, int actualPage, int amountPerPage){
+		return this.PreviousPage(actualPage, amountPerPage);
+	}
+	
+	/**
+	 * Return if Archived Cases list has a next page
+	 * @param userId
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
 	public Boolean hasNextPageArchivedCases(long userId, int actualPage, int amountPerPage){
 		List<Case> cases= this.archivedCases(userId, actualPage + 1, amountPerPage);
+		return (cases.size() > 0);
+	}
+	
+	/**
+	 * Return if Archived Cases list has a next page
+	 * @param userId
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
+	public Boolean hasNextPageArchivedCases(long userId, int actualPage, int amountPerPage, Boolean orderAsc, String search){
+		List<Case> cases= this.archivedCases(userId, actualPage + 1, amountPerPage, orderAsc, search);
 		return (cases.size() > 0);
 	}
 	
 	/*
 	 * SECCION TASKS
 	 */
-	public List<Task> tasks(int page, int amountPerPage){
-		String url= "API/bpm/humanTask?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage);
+	
+	/**
+	 * Paged Task list ordered by priority
+	 * @param page
+	 * @param amountPerPage
+	 * @return
+	 */
+	public List<Task> tasks(int page, int amountPerPage, Boolean orderAsc, String search){
+		String order= "ASC";
+		if(!orderAsc)order= "DESC";
+		String url= "API/bpm/humanTask?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&o=priority%20" + order + "&s=" + search + "&d=rootContainerId";
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		
 		return this.mapearTasks(resultado);
 	}
 	
-	public Boolean hasPreviewPageTasks(int actualPage, int amountPerPage){
-		return this.previewPage(actualPage, amountPerPage);
+	/**
+	 * Paged Task list ordered by priority
+	 * @param page
+	 * @param amountPerPage
+	 * @return
+	 */
+	public List<Task> tasks(int page, int amountPerPage){
+		return this.tasks(page, amountPerPage, false, "");
 	}
 	
+	/**
+	 * Return if Task list has previous page
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
+	public Boolean hasPreviousPageTasks(int actualPage, int amountPerPage){
+		return this.PreviousPage(actualPage, amountPerPage);
+	}
+	
+	/**
+	 * Return if Task list has next page
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
 	public Boolean hasNextPageTasks(int actualPage, int amountPerPage){
 		List<Task> tasks= this.tasks(actualPage + 1, amountPerPage);
 		return (tasks.size() > 0);
 	}
 	
+	/**
+	 * Return if Task list has next page
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
+	public Boolean hasNextPageTasks(int actualPage, int amountPerPage, Boolean orderAsc, String search){
+		List<Task> tasks= this.tasks(actualPage + 1, amountPerPage, orderAsc, search);
+		return (tasks.size() > 0);
+	}
 	
-	public List<Task> tasks(long userId, int page, int amountPerPage){
-		String url= "API/bpm/humanTask?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=state=ready&f=user_id=" + Long.toString(userId);
+	/**
+	 * Paged Task list of a User ordered by priority
+	 * @param userId
+	 * @param page
+	 * @param amountPerPage
+	 * @return
+	 */
+	public List<Task> tasks(long userId, int page, int amountPerPage, Boolean orderAsc, String search){
+		String order= "ASC";
+		if(!orderAsc)order= "DESC";
+		String url= "API/bpm/humanTask?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=state=ready&f=user_id=" + Long.toString(userId) + "&o=priority%20" + order + "&s=" + search + "&d=rootContainerId";
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		
 		return this.mapearTasks(resultado);
 	}
 	
-	public Boolean hasPreviewPageTasks(long userId, int actualPage, int amountPerPage){
-		return this.previewPage(actualPage, amountPerPage);
+	/**
+	 * Paged Task list of a User ordered by priority
+	 * @param userId
+	 * @param page
+	 * @param amountPerPage
+	 * @return
+	 */
+	public List<Task> tasks(long userId, int page, int amountPerPage){
+		return this.tasks(userId, page, amountPerPage, false, "");
 	}
 	
+	/**
+	 * Return if Task list of user has previous page
+	 * @param userId
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
+	public Boolean hasPreviousPageTasks(long userId, int actualPage, int amountPerPage){
+		return this.PreviousPage(actualPage, amountPerPage);
+	}
+	
+	/**
+	 * Return if Task list of user has next page
+	 * @param userId
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
 	public Boolean hasNextPageTasks(long userId, int actualPage, int amountPerPage){
 		List<Task> tasks= this.tasks(userId, actualPage + 1, amountPerPage);
 		return (tasks.size() > 0);
 	}
 	
+	/**
+	 * Return if Task list of user has next page
+	 * @param userId
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
+	public Boolean hasNextPageTasks(long userId, int actualPage, int amountPerPage, Boolean orderAsc, String search){
+		List<Task> tasks= this.tasks(userId, actualPage + 1, amountPerPage, orderAsc, search);
+		return (tasks.size() > 0);
+	}
+	
+	/**
+	 * Return Task with Id
+	 * @param taskId
+	 * @return
+	 */
 	public Task task(long taskId){
 		String url= "API/bpm/humanTask/" + Long.toString(taskId);
 		String metodo= "GET";
@@ -582,6 +1029,12 @@ public class BonitaApi implements java.io.Serializable{
 		return task;
 	}
 	
+	/**
+	 * Assign a Task with Id to a User with Id
+	 * @param taskId
+	 * @param userId
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public Boolean assignTask(long taskId, long userId){
 		String url= "API/bpm/humanTask/" + Long.toString(taskId);
@@ -596,6 +1049,11 @@ public class BonitaApi implements java.io.Serializable{
 		}
 	}
 	
+	/**
+	 * Release a Task with Id
+	 * @param taskId
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public Boolean releaseTask(long taskId){
 		String url= "API/bpm/humanTask/" + Long.toString(taskId);
@@ -610,29 +1068,81 @@ public class BonitaApi implements java.io.Serializable{
 		}
 	}
 	
-	public List<Task> archivedHumanTask(long userId, int page, int amountPerPage){
-		String url= "API/bpm/archivedHumanTask?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=assigned_id=" + Long.toString(userId);
+	/**
+	 * Paged Archived Human Task list for a User
+	 * @param userId
+	 * @param page
+	 * @param amountPerPage
+	 * @return
+	 */
+	public List<Task> archivedHumanTask(long userId, int page, int amountPerPage, Boolean orderAsc, String search){
+		String order= "ASC";
+		if(!orderAsc)order= "DESC";
+		String url= "API/bpm/archivedHumanTask?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=assigned_id=" + Long.toString(userId) + "&reached_state_date=%20" + order + "&s=" + search + "&d=rootContainerId";
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		
 		return this.mapearTasks(resultado);
 	}
 	
-	public Boolean hasPreviewPageArchivedHumanTask(long userId, int actualPage, int amountPerPage){
-		return this.previewPage(actualPage, amountPerPage);
+	/**
+	 * Paged Archived Human Task list for a User
+	 * @param userId
+	 * @param page
+	 * @param amountPerPage
+	 * @return
+	 */
+	public List<Task> archivedHumanTask(long userId, int page, int amountPerPage){
+		return this.archivedHumanTask(userId, page, amountPerPage, false, "");
 	}
 	
+	/**
+	 * Return if Archived Human Task has previous page
+	 * @param userId
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
+	public Boolean hasPreviousPageArchivedHumanTask(long userId, int actualPage, int amountPerPage){
+		return this.PreviousPage(actualPage, amountPerPage);
+	}
+	
+	/**
+	 * Return if Archived Human Task has next page
+	 * @param userId
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
 	public Boolean hasNextPageArchivedHumanTask(long userId, int actualPage, int amountPerPage){
 		List<Task> tasks= this.archivedHumanTask(userId, actualPage + 1, amountPerPage);
 		return (tasks.size() > 0);
 	}
 		
+	/**
+	 * Return if Archived Human Task has next page
+	 * @param userId
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
+	public Boolean hasNextPageArchivedHumanTask(long userId, int actualPage, int amountPerPage, Boolean orderAsc, String search){
+		List<Task> tasks= this.archivedHumanTask(userId, actualPage + 1, amountPerPage, orderAsc, search);
+		return (tasks.size() > 0);
+	}
+	
 	
 	/*
 	 * METODOS PRIVADOS
 	 */
 	
-	private Boolean previewPage(int actualPage, int amountPerPage){
+	/**
+	 * Return if a list has previous page - generic method for all list
+	 * @param actualPage
+	 * @param amountPerPage
+	 * @return
+	 */
+	private Boolean PreviousPage(int actualPage, int amountPerPage){
 		actualPage--;
 		if(actualPage > 0){
 			return true;
@@ -666,6 +1176,24 @@ public class BonitaApi implements java.io.Serializable{
 		}
 		
 		return processes;
+	}
+	
+	private Process mapearProcess(String jsonString){
+		try {
+			JSONParser par= new JSONParser();  		
+			JSONObject json= (JSONObject) par.parse(jsonString);
+			Process process= new Process();
+			process.setId(Long.parseLong((String)json.get("id")));
+			process.setName((String) json.get("name"));
+			process.setDescription((String) json.get("description"));
+			process.setDisplayName((String) json.get("displayName"));
+			process.setDisplayDescription((String) json.get("displayDescription"));
+			process.setState((String) json.get("activationState"));
+			process.setVersion((String) json.get("version"));
+			return process;
+		}catch(Exception e){
+			return null;
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -733,6 +1261,21 @@ public class BonitaApi implements java.io.Serializable{
 		return roles;
 	}
 	
+	private Role mapearRole(String jsonString){
+		try {
+			JSONParser par= new JSONParser();  		
+			JSONObject json= (JSONObject) par.parse(jsonString);
+			Role role= new Role();
+			role.setId(Long.parseLong((String)json.get("id")));
+			role.setName((String) json.get("name"));
+			role.setDisplayName((String) json.get("displayName"));
+			role.setDescription((String) json.get("description"));
+			return role;
+		}catch(Exception e){
+			return null;
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	private List<Group> mapearGroups(String jsonString){	
 		List<Group> groups= new ArrayList<Group>();
@@ -757,6 +1300,21 @@ public class BonitaApi implements java.io.Serializable{
 		return groups;
 	}
 	
+	private Group mapearGroup(String jsonString){
+		try {
+			JSONParser par= new JSONParser();  		
+			JSONObject json= (JSONObject) par.parse(jsonString);
+			Group group= new Group();
+			group.setId(Long.parseLong((String)json.get("id")));
+			group.setName((String) json.get("name"));
+			group.setDisplayName((String) json.get("displayName"));
+			group.setDescription((String) json.get("description"));
+			return group;
+		}catch(Exception e){
+			return null;
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	private List<Membership> mapearMemberships(String jsonString){	
 		List<Membership> memberships= new ArrayList<Membership>();
@@ -769,8 +1327,9 @@ public class BonitaApi implements java.io.Serializable{
 				JSONObject userJson= it.next();
 				Membership membership= new Membership();
 				membership.setUserId(Long.parseLong((String)userJson.get("user_id")));
-				membership.setRole(this.role(Long.parseLong((String)userJson.get("role_id"))));
-				membership.setGroup(this.group(Long.parseLong((String)userJson.get("group_id"))));
+				
+				membership.setRole(this.mapearRole(userJson.get("role_id").toString()));
+				membership.setGroup(this.mapearGroup(userJson.get("group_id").toString()));
 				memberships.add(membership);
 			}
 		} catch (ParseException e) {
@@ -819,7 +1378,9 @@ public class BonitaApi implements java.io.Serializable{
 				caso.setBeginDate((String) caseJson.get("start"));
 				caso.setEndDate((String) caseJson.get("end_date"));
 				caso.setStartedBy(Long.parseLong((String)caseJson.get("started_by")));
-				caso.setProcess(this.deployedProcess(Long.parseLong((String)caseJson.get("processDefinitionId"))));
+				
+				caso.setProcess(this.mapearProcess(caseJson.get("processDefinitionId").toString()));
+				//caso.setProcess(this.deployedProcess(Long.parseLong((String)caseJson.get("processDefinitionId"))));
 				cases.add(caso);
 			}
 		} catch (ParseException e) {
@@ -877,7 +1438,9 @@ public class BonitaApi implements java.io.Serializable{
 					assignedId= Long.parseLong((String)userJson.get("assigned_id"));
 				}
 				task.setAssignedId(assignedId);
-				task.setProcess(this.deployedProcess(Long.parseLong((String)userJson.get("processId"))));
+				
+				task.setProcess(this.mapearProcess(userJson.get("rootContainerId").toString()));
+				//task.setProcess(this.deployedProcess(Long.parseLong((String)userJson.get("processId"))));
 				tasks.add(task);
 			}
 		} catch (ParseException e) {

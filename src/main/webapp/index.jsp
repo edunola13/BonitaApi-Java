@@ -10,7 +10,7 @@
 <%BonitaApi con= new BonitaApi("6.5","http://localhost:8080/bonita/","Fede22", "Fede22");
  //User user= con.user("compras");
  //List<bonitaClass.Process> precesos= con.deployedProccessForUser(con.actualUser().getId()); %>
- <%= con.getCorrectLogin() %>
+ <%= con.getCorrectLogin()%>
 <%--  <%for ( bonitaClass.Process preceso : precesos ) { %> --%>
 <%-- 	<%=preceso.getVersion() %> --%>
 <%-- 	<%=preceso.getName() %> --%>

@@ -7,7 +7,7 @@
 <%-- <%BonitaProxy pro= new BonitaProxy();%> --%>
 <%-- <%=pro.autentificarse("juan", "juan")%> --%>
 
-<%BonitaApi con= new BonitaApi("6.5","http://localhost:8080/bonita/","Fede22", "Fede22");
+<%BonitaApi con= new BonitaApi("6.2","http://server200364b:8080/bonita/","admin", "bpm");
  //User user= con.user("compras");
  //List<bonitaClass.Process> precesos= con.deployedProccessForUser(con.actualUser().getId()); %>
  <%= con.getCorrectLogin()%>

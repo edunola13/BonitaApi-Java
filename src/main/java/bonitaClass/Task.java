@@ -22,7 +22,7 @@ public class Task implements java.io.Serializable{
 	private long executedBy;
 	private long caseId;
 	private long actorId;
-	private long assignedId;
+	private User assignedId;
 	private Process process;
 	
 	public Task(){
@@ -156,12 +156,12 @@ public class Task implements java.io.Serializable{
 	public void setActorId(long actorId) {
 		this.actorId = actorId;
 	}
-
-	public long getAssignedId() {
+	
+	public User getAssignedId() {
 		return assignedId;
 	}
 
-	public void setAssignedId(long assignedId) {
+	public void setAssignedId(User assignedId) {
 		this.assignedId = assignedId;
 	}
 

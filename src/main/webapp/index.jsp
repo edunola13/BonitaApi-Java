@@ -7,7 +7,7 @@
 <%-- <%BonitaProxy pro= new BonitaProxy();%> --%>
 <%-- <%=pro.autentificarse("juan", "juan")%> --%>
 
-<%BonitaApi con= new BonitaApi("6.2","http://server200364b:8080/bonita/","admin", "bpm");
+<%BonitaApi con= new BonitaApi("6.2","http://localhost:8080/bonita/","test", "test");
  //User user= con.user("compras");
  //List<bonitaClass.Process> precesos= con.deployedProccessForUser(con.actualUser().getId()); %>
  <%= con.getCorrectLogin()%>
@@ -37,15 +37,15 @@
 
 <%-- <%= user.getId() %> --%>
 
-<%-- <%List<Task> tasks= con.archivedHumanTask(con.actualUser().getId(),0,100, true, "Ta");%> --%>
-<%-- <%for ( Task task : tasks ) { %> --%>
-<%-- 	<%=task.getId() %> --%>
-<%-- 	<%=task.getProcess().getName() %> --%>
-<%-- 	<%=task.timeToDeadline() %> --%>
-<%-- 	<%=task.exceededDeadline() %> --%>
-<%-- 	<%=task.timeExceededDeadline() %> --%>
-<!-- 	<br/> -->
-<%-- <%} %> --%>
+<%List<Task> tasks= con.archivedHumanTask(201, 0, 100);%>
+<%for ( Task task : tasks ) { %>
+	<%=task.getId() %>
+	<%=task.getProcess().getName() %>
+	<%=task.timeToDeadline() %>
+	<%=task.exceededDeadline() %>
+	<%=(task.getAssignedId() != null ? task.getAssignedId().getFirstName() : "No Asignado") %>	
+	<br/>
+<%} %>
 
 <%-- <%=con.role("member").getName() %> --%>
 

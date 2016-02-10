@@ -517,7 +517,7 @@ public class BonitaApi implements java.io.Serializable{
 	 */
 	public List<Profile> profiles(){
 		String url= "API/userXP/profile?p=0&c=100";
-		if(this.version != "6.1" && this.version != "6.2"){
+		if(this.version.equals("6.1") && this.version.equals("6.2")){
 			url= "API/portal/profile?p=0&c=100";
 		}
 		
@@ -533,7 +533,7 @@ public class BonitaApi implements java.io.Serializable{
 	 */
 	public List<Profile> userProfiles(long userId){
 		String url= "API/userXP/profile?f=user_id=" + Long.toString(userId);
-		if(this.version != "6.1" && this.version != "6.2"){
+		if(this.version.equals("6.1") && this.version.equals("6.2")){
 			url= "API/portal/profile?f=user_id=" + Long.toString(userId);
 		}
 		
@@ -550,7 +550,7 @@ public class BonitaApi implements java.io.Serializable{
 	 */
 	public Boolean hasProfile(long userId, String profileName){
 		String url= "API/userXP/profile?f=user_id=" + Long.toString(userId);
-		if(this.version != "6.1" && this.version != "6.2"){
+		if(this.version.equals("6.1") && this.version.equals("6.2")){
 			url= "API/portal/profile?f=user_id=" + Long.toString(userId);
 		}
 		
@@ -888,7 +888,7 @@ public class BonitaApi implements java.io.Serializable{
 	public List<Task> tasks(int page, int amountPerPage, Boolean orderAsc, String search){
 		String order= "ASC";
 		if(!orderAsc)order= "DESC";
-		String url= "API/bpm/humanTask?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&o=priority%20" + order + "&s=" + search + "&d=rootContainerId";
+		String url= "API/bpm/humanTask?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&o=priority%20" + order + "&s=" + search + "&d=rootContainerId&d=assigned_id";
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		
@@ -947,7 +947,7 @@ public class BonitaApi implements java.io.Serializable{
 	public List<Task> tasks(long userId, int page, int amountPerPage, Boolean orderAsc, String search){
 		String order= "ASC";
 		if(!orderAsc)order= "DESC";
-		String url= "API/bpm/humanTask?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=state=ready&f=user_id=" + Long.toString(userId) + "&o=priority%20" + order + "&s=" + search + "&d=rootContainerId";
+		String url= "API/bpm/humanTask?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=state=ready&f=user_id=" + Long.toString(userId) + "&o=priority%20" + order + "&s=" + search + "&d=rootContainerId&d=assigned_id";
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		
@@ -1006,7 +1006,7 @@ public class BonitaApi implements java.io.Serializable{
 	 * @return
 	 */
 	public Task task(long taskId){
-		String url= "API/bpm/humanTask/" + Long.toString(taskId);
+		String url= "API/bpm/humanTask/" + Long.toString(taskId)+"?d=assigned_id";
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		
@@ -1015,7 +1015,7 @@ public class BonitaApi implements java.io.Serializable{
 	
 	@Deprecated
 	public Task task(long userId, long taskId){
-		String url= "API/bpm/humanTask?p=0&c=10000&f=user_id=" + Long.toString(userId);
+		String url= "API/bpm/humanTask?p=0&c=10000&f=user_id=" + Long.toString(userId)+"&d=assigned_id";
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		
@@ -1078,7 +1078,7 @@ public class BonitaApi implements java.io.Serializable{
 	public List<Task> archivedHumanTask(long userId, int page, int amountPerPage, Boolean orderAsc, String search){
 		String order= "ASC";
 		if(!orderAsc)order= "DESC";
-		String url= "API/bpm/archivedHumanTask?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=assigned_id=" + Long.toString(userId) + "&reached_state_date=%20" + order + "&s=" + search + "&d=rootContainerId";
+		String url= "API/bpm/archivedHumanTask?p=" + Integer.toString(page) + "&c=" + Integer.toString(amountPerPage) + "&f=assigned_id=" + Long.toString(userId) + "&reached_state_date=%20" + order + "&s=" + search + "&d=rootContainerId&d=assigned_id";
 		String metodo= "GET";
 		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
 		
@@ -1433,9 +1433,10 @@ public class BonitaApi implements java.io.Serializable{
 				task.setExecutedBy(Long.parseLong((String)userJson.get("executedBy")));				
 				task.setCaseId(Long.parseLong((String)userJson.get("caseId")));
 				task.setActorId(Long.parseLong((String)userJson.get("actorId")));
-				long assignedId= 0;
-				if(! ((String)userJson.get("assigned_id")).isEmpty()){
-					assignedId= Long.parseLong((String)userJson.get("assigned_id"));
+				User assignedId= null;
+				String user= userJson.get("assigned_id").toString();
+				if(!user.isEmpty()){
+					assignedId= this.mapearUser(user);
 				}
 				task.setAssignedId(assignedId);
 				
@@ -1469,9 +1470,10 @@ public class BonitaApi implements java.io.Serializable{
 			task.setExecutedBy(Long.parseLong((String)json.get("executedBy")));				
 			task.setCaseId(Long.parseLong((String)json.get("caseId")));
 			task.setActorId(Long.parseLong((String)json.get("actorId")));
-			long assignedId= 0;
-			if(! ((String)json.get("assigned_id")).isEmpty()){
-				assignedId= Long.parseLong((String)json.get("assigned_id"));
+			User assignedId= null;
+			String user= json.get("assigned_id").toString();
+			if(!user.isEmpty()){
+				assignedId= this.mapearUser(user);
 			}
 			task.setAssignedId(assignedId);
 			task.setProcess(this.deployedProcess(Long.parseLong((String)json.get("processId"))));

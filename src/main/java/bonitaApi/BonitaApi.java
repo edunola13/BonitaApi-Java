@@ -382,6 +382,66 @@ public class BonitaApi implements java.io.Serializable{
 	}
 	
 	/**
+	 * Create a Role
+	 * @param roleName
+	 * @param displayName
+	 * @param description
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Role createRole(String roleName, String displayName, String description){
+		String url= "API/identity/role/";
+		String metodo= "POST";
+		JSONObject json= new JSONObject();
+		json.put("icon", "");
+		json.put("name", roleName);
+		json.put("displayName", displayName);
+		json.put("description", description);
+		String resultado= this.proxy.enviarPeticion(url, metodo, json.toJSONString(), "application/json");
+		return this.mapearRole(resultado);
+	}
+	
+	/**
+	 * Update Role
+	 * @param id
+	 * @param roleName
+	 * @param displayName
+	 * @param description
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Boolean updateRole(long id, String roleName, String displayName, String description){
+		String url= "API/identity/role/" + Long.toString(id);
+		String metodo= "PUT";
+		JSONObject json= new JSONObject();
+		json.put("name", roleName);
+		json.put("displayName", displayName);
+		json.put("description", description);
+		String resultado= this.proxy.enviarPeticion(url, metodo, json.toJSONString(), "application/json");
+		if(! resultado.equals("error")){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	/**
+	 * Delete Rule
+	 * @param id
+	 * @return
+	 */
+	public Boolean deleteRole(long id){
+		String url= "API/identity/role/" + Long.toString(id);
+		String metodo= "DELETE";
+		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
+		if(! resultado.equals("error")){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	/**
 	 * Paged Group list ordered by displayName
 	 * @param page
 	 * @param amountPerPage
@@ -451,6 +511,66 @@ public class BonitaApi implements java.io.Serializable{
 	}
 	
 	/**
+	 * Create a Group
+	 * @param groupName
+	 * @param displayName
+	 * @param description
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Group createGroup(String groupName, String displayName, String description){
+		String url= "API/identity/group/";
+		String metodo= "POST";
+		JSONObject json= new JSONObject();
+		json.put("icon", "");
+		json.put("name", groupName);
+		json.put("displayName", displayName);
+		json.put("description", description);
+		String resultado= this.proxy.enviarPeticion(url, metodo, json.toJSONString(), "application/json");
+		return this.mapearGroup(resultado);
+	}
+	
+	/**
+	 * Update Role
+	 * @param id
+	 * @param groupName
+	 * @param displayName
+	 * @param description
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Boolean updateGroup(long id, String groupName, String displayName, String description){
+		String url= "API/identity/group/" + Long.toString(id);
+		String metodo= "PUT";
+		JSONObject json= new JSONObject();
+		json.put("name", groupName);
+		json.put("displayName", displayName);
+		json.put("description", description);
+		String resultado= this.proxy.enviarPeticion(url, metodo, json.toJSONString(), "application/json");
+		if(! resultado.equals("error")){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	/**
+	 * Delete Rule
+	 * @param id
+	 * @return
+	 */
+	public Boolean deleteGroup(long id){
+		String url= "API/identity/group/" + Long.toString(id);
+		String metodo= "DELETE";
+		String resultado= this.proxy.enviarPeticion(url, metodo, null, null);
+		if(! resultado.equals("error")){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	/**
 	 * Add a new Membership
 	 * @param userId
 	 * @param roleId
@@ -510,7 +630,7 @@ public class BonitaApi implements java.io.Serializable{
 		List<Membership> memberships= this.memberships(userId, actualPage + 1, amountPerPage);
 		return (memberships.size() > 0);
 	}
-	
+		
 	/**
 	 * Profile list
 	 * @return

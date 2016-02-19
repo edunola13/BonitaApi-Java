@@ -37,15 +37,17 @@
 
 <%-- <%= user.getId() %> --%>
 
-<%List<Task> tasks= con.archivedHumanTask(201, 0, 100);%>
-<%for ( Task task : tasks ) { %>
-	<%=task.getId() %>
-	<%=task.getProcess().getName() %>
-	<%=task.timeToDeadline() %>
-	<%=task.exceededDeadline() %>
-	<%=(task.getAssignedId() != null ? task.getAssignedId().getFirstName() : "No Asignado") %>	
-	<br/>
-<%} %>
+<%-- <%con.updateGroup(3l, "Sistema", "Sistema", "des"); %> --%>
+
+<%-- <%List<Task> tasks= con.archivedHumanTask(201, 0, 100);%> --%>
+<%-- <%for ( Task task : tasks ) { %> --%>
+<%-- 	<%=task.getId() %> --%>
+<%-- 	<%=task.getProcess().getName() %> --%>
+<%-- 	<%=task.timeToDeadline() %> --%>
+<%-- 	<%=task.exceededDeadline() %> --%>
+<%-- 	<%=(task.getAssignedId() != null ? task.getAssignedId().getFirstName() : "No Asignado") %>	 --%>
+<!-- 	<br/> -->
+<%-- <%} %> --%>
 
 <%-- <%=con.role("member").getName() %> --%>
 

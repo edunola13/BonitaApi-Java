@@ -18,6 +18,7 @@ public class Task implements java.io.Serializable{
 	private String priority;
 	private String state;
 	private Date dueDate;
+	private Date reachedStateDate;
 	private Date executedDate;
 	private long executedBy;
 	private long caseId;
@@ -113,6 +114,26 @@ public class Task implements java.io.Serializable{
 		}
 	}
 	
+	public Date getReachedStateDate() {
+		return reachedStateDate;
+	}
+	
+	public String getReachedStateDateString(){
+		String dateString = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(this.getReachedStateDate());
+		return dateString;
+	}
+
+	public void setReachedStateDate(String reachedStateDate) {
+		if(! reachedStateDate.equals("")){
+			try{
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+				this.reachedStateDate = sdf.parse(reachedStateDate);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+	}
+
 	public Date getExecutedDate() {
 		return executedDate;
 	}

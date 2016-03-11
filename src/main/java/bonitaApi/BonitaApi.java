@@ -1549,6 +1549,7 @@ public class BonitaApi implements java.io.Serializable{
 				task.setPriority((String) userJson.get("priority"));				
 				task.setState((String) userJson.get("state"));
 				task.setDueDate((String) userJson.get("dueDate"));
+				task.setReachedStateDate((String) userJson.get("reached_state_date"));
 				task.setExecutedDate((String) userJson.get("reached_state_date"));
 				task.setExecutedBy(Long.parseLong((String)userJson.get("executedBy")));				
 				task.setCaseId(Long.parseLong((String)userJson.get("caseId")));
@@ -1586,6 +1587,7 @@ public class BonitaApi implements java.io.Serializable{
 			task.setPriority((String) json.get("priority"));				
 			task.setState((String) json.get("state"));
 			task.setDueDate((String) json.get("dueDate"));
+			task.setReachedStateDate((String) json.get("reached_state_date"));
 			task.setExecutedDate((String) json.get("reached_state_date"));
 			task.setExecutedBy(Long.parseLong((String)json.get("executedBy")));				
 			task.setCaseId(Long.parseLong((String)json.get("caseId")));

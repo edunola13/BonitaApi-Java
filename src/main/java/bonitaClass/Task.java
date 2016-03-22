@@ -199,54 +199,66 @@ public class Task implements java.io.Serializable{
 	 */
 	
 	public Boolean exceededDeadline(){
-		Calendar cal= Calendar.getInstance();
-		if(this.getDueDate().getTime() < cal.getTime().getTime()){
-			return true;
-		}else{
+		try{
+			Calendar cal= Calendar.getInstance();
+			if(this.getDueDate().getTime() < cal.getTime().getTime()){
+				return true;
+			}else{
+				return false;
+			}
+		}catch(Exception e){
 			return false;
-		}
+		}		
 	}
 	
 	public String timeToDeadline(){
-		Calendar cal= Calendar.getInstance();
-		if(cal.getTime().getTime() < this.getDueDate().getTime()){
-			System.out.println(this.getDueDate() + " " + cal.getTime());
-			long diferenciaEn_ms = this.getDueDate().getTime() - cal.getTime().getTime();
-			
-			String tiempo= "";
-			if(diferenciaEn_ms / (1000 * 60) <= 60L){
-				tiempo= Long.toString(diferenciaEn_ms / (1000 * 60)) + "min";
-			}else if(diferenciaEn_ms / (1000 * 60 * 60) <= 24){
-				tiempo= Long.toString(diferenciaEn_ms / (1000 * 60 * 60)) + "hour";
+		try{
+			Calendar cal= Calendar.getInstance();
+			if(cal.getTime().getTime() < this.getDueDate().getTime()){
+				System.out.println(this.getDueDate() + " " + cal.getTime());
+				long diferenciaEn_ms = this.getDueDate().getTime() - cal.getTime().getTime();
+				
+				String tiempo= "";
+				if(diferenciaEn_ms / (1000 * 60) <= 60L){
+					tiempo= Long.toString(diferenciaEn_ms / (1000 * 60)) + "min";
+				}else if(diferenciaEn_ms / (1000 * 60 * 60) <= 24){
+					tiempo= Long.toString(diferenciaEn_ms / (1000 * 60 * 60)) + "hour";
+				}else{
+					tiempo= Long.toString(diferenciaEn_ms / (1000 * 60 * 60 * 24)) + "day";
+				}
+				
+				return tiempo;
 			}else{
-				tiempo= Long.toString(diferenciaEn_ms / (1000 * 60 * 60 * 24)) + "day";
+				//Retorna 0 ya que se excedio
+				return "0";
 			}
-			
-			return tiempo;
-		}else{
-			//Retorna 0 ya que se excedio
+		}catch(Exception e){
 			return "0";
-		}		
+		}
 	}
 	
 	public String timeExceededDeadline(){
-		Calendar cal= Calendar.getInstance();
-		if(this.getDueDate().getTime() < cal.getTime().getTime()){
-			long diferenciaEn_ms = cal.getTime().getTime() - this.getDueDate().getTime();
-			
-			String tiempo= "";
-			if(diferenciaEn_ms / (1000 * 60) <= 60L){
-				tiempo= Long.toString(diferenciaEn_ms / (1000 * 60)) + "min";
-			}else if(diferenciaEn_ms / (1000 * 60 * 60) <= 24){
-				tiempo= Long.toString(diferenciaEn_ms / (1000 * 60 * 60)) + "hour";
+		try{
+			Calendar cal= Calendar.getInstance();
+			if(this.getDueDate().getTime() < cal.getTime().getTime()){
+				long diferenciaEn_ms = cal.getTime().getTime() - this.getDueDate().getTime();
+				
+				String tiempo= "";
+				if(diferenciaEn_ms / (1000 * 60) <= 60L){
+					tiempo= Long.toString(diferenciaEn_ms / (1000 * 60)) + "min";
+				}else if(diferenciaEn_ms / (1000 * 60 * 60) <= 24){
+					tiempo= Long.toString(diferenciaEn_ms / (1000 * 60 * 60)) + "hour";
+				}else{
+					tiempo= Long.toString(diferenciaEn_ms / (1000 * 60 * 60 * 24)) + "day";
+				}
+				
+				return tiempo;
 			}else{
-				tiempo= Long.toString(diferenciaEn_ms / (1000 * 60 * 60 * 24)) + "day";
+				//Retorna 0 ya que se excedio
+				return "0";
 			}
-			
-			return tiempo;
-		}else{
-			//Retorna 0 ya que se excedio
+		}catch(Exception e){
 			return "0";
-		}		
+		}
 	}
 }

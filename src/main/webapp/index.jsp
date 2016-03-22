@@ -16,7 +16,9 @@
 <%-- 	<%=preceso.getName() %> --%>
 <%-- <%} %> --%>
  
-<%-- <%List<Case> cases= con.cases(con.actualUser().getId(),0,100);%> --%>
+<%-- <%=con.caseById(8005l).getProcess().getName() %> --%>
+ 
+<%-- <%List<Case> cases= con.casesProcess(7253659303785341982l, true, "");%> --%>
 <%-- <%for ( Case caso : cases ) { %> --%>
 <%-- 	<%=caso.getId() %> --%>
 <%-- 	<%=caso.getProcess().getId() %> --%>
@@ -39,11 +41,11 @@
 
 <%-- <%con.updateGroup(3l, "Sistema", "Sistema", "des"); %> --%>
 
-<%-- <%List<Task> tasks= con.archivedHumanTask(201, 0, 100);%> --%>
+<%-- <%List<Task> tasks= con.tasksCase(16012l, "");%> --%>
 <%-- <%for ( Task task : tasks ) { %> --%>
 <%-- 	<%=task.getId() %> --%>
 <%-- 	<%=task.getProcess().getName() %> --%>
-<%-- 	<%=task.timeToDeadline() %> --%>
+<%-- 	<%=//task.timeToDeadline() %> --%>
 <%-- 	<%=task.exceededDeadline() %> --%>
 <%-- 	<%=(task.getAssignedId() != null ? task.getAssignedId().getFirstName() : "No Asignado") %>	 --%>
 <!-- 	<br/> -->

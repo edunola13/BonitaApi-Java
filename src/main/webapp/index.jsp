@@ -7,7 +7,7 @@
 <%-- <%BonitaProxy pro= new BonitaProxy();%> --%>
 <%-- <%=pro.autentificarse("juan", "juan")%> --%>
 
-<%BonitaApi con= new BonitaApi("6.5","http://localhost:8080/bonita/","Fede22", "Fede22");
+<%BonitaApi con= new BonitaApi("6.2","http://localhost:8080/bonita/","test", "test");
  //User user= con.user("compras");
  //List<bonitaClass.Process> precesos= con.deployedProccessForUser(con.actualUser().getId()); %>
  <%= con.getCorrectLogin()%>
@@ -16,7 +16,9 @@
 <%-- 	<%=preceso.getName() %> --%>
 <%-- <%} %> --%>
  
-<%-- <%List<Case> cases= con.cases(con.actualUser().getId(),0,100);%> --%>
+<%-- <%=con.caseById(8005l).getProcess().getName() %> --%>
+ 
+<%-- <%List<Case> cases= con.casesProcess(7253659303785341982l, true, "");%> --%>
 <%-- <%for ( Case caso : cases ) { %> --%>
 <%-- 	<%=caso.getId() %> --%>
 <%-- 	<%=caso.getProcess().getId() %> --%>
@@ -37,13 +39,15 @@
 
 <%-- <%= user.getId() %> --%>
 
-<%-- <%List<Task> tasks= con.archivedHumanTask(con.actualUser().getId(),0,100, true, "Ta");%> --%>
+<%-- <%con.updateGroup(3l, "Sistema", "Sistema", "des"); %> --%>
+
+<%-- <%List<Task> tasks= con.tasksCase(16012l, "");%> --%>
 <%-- <%for ( Task task : tasks ) { %> --%>
 <%-- 	<%=task.getId() %> --%>
 <%-- 	<%=task.getProcess().getName() %> --%>
-<%-- 	<%=task.timeToDeadline() %> --%>
+<%-- 	<%=//task.timeToDeadline() %> --%>
 <%-- 	<%=task.exceededDeadline() %> --%>
-<%-- 	<%=task.timeExceededDeadline() %> --%>
+<%-- 	<%=(task.getAssignedId() != null ? task.getAssignedId().getFirstName() : "No Asignado") %>	 --%>
 <!-- 	<br/> -->
 <%-- <%} %> --%>
 

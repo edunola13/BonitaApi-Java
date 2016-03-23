@@ -9,6 +9,7 @@ public class Case implements java.io.Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	private long id;
+	private long rootCaseId;
 	private String state;
 	private Date beginDate;
 	private Date endDate;
@@ -25,6 +26,14 @@ public class Case implements java.io.Serializable{
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public long getRootCaseId() {
+		return rootCaseId;
+	}
+
+	public void setRootCaseId(long rootCaseId) {
+		this.rootCaseId = rootCaseId;
 	}
 
 	public String getState() {

@@ -6,9 +6,9 @@ public class Role implements java.io.Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	private long id;
-	private String name;
-	private String displayName;
-	private String description;
+	private String name= "";
+	private String displayName= "";
+	private String description= "";
 	
 	public Role(){
 		

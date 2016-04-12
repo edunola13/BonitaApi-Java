@@ -78,8 +78,11 @@
 
 <%-- <%= con.addMembership(12L, 12L, 12L) %> --%>
 
-<%-- <%long processId= 7253659303785341982L; %> --%>
-<%-- <%= con.startCase(processId).getStartedBy() %> --%>
+<%/*long processId= 7253659303785341982L; 
+List<Variable> variables= new ArrayList<Variable>();
+variables.add(new Variable("informacion", "valor"));*/
+%>
+<%-- <%= con.startCase(processId, variables).getStartedBy() %> --%>
 <h2>Hello World!</h2>
 </body>
 </html>

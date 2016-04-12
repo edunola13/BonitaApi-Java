@@ -17,6 +17,7 @@ import bonitaClass.Profile;
 import bonitaClass.Role;
 import bonitaClass.Task;
 import bonitaClass.User;
+import bonitaClass.Variable;
 
 public class BonitaApi implements java.io.Serializable {
 	/**
@@ -1040,11 +1041,21 @@ public class BonitaApi implements java.io.Serializable {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public Case startCase(long processId) {
+	public Case startCase(long processId, List<Variable> variables) {
 		String url = "API/bpm/case/";
 		String metodo = "POST";
 		JSONObject json = new JSONObject();
 		json.put("processDefinitionId", Long.toString(processId));
+		if(variables != null){
+			JSONArray vars = new JSONArray();
+			for(Variable variable : variables){
+				JSONObject var = new JSONObject();
+				var.put("name", variable.getName());
+				var.put("value", variable.getValue());
+				vars.add(var);
+			}
+			json.put("variables", vars);
+		}
 		String resultado = this.proxy.enviarPeticion(url, metodo,
 				json.toJSONString(), "application/json");
 		return this.mapearCase(resultado, false);

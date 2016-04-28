@@ -650,6 +650,24 @@ public class BonitaApi implements java.io.Serializable {
 			return false;
 		}
 	}
+	
+	/**
+	 * Elimina una membresia de un determinado usuario
+	 * @param userId
+	 * @param roleId
+	 * @param groupId
+	 * @return
+	 */
+	public Boolean removeMembership(long userId, long roleId, long groupId){
+		String url = "API/identity/membership/" + Long.toString(userId) + "/" + Long.toString(groupId) + "/" + Long.toString(roleId);
+		String metodo = "DELETE";
+		String resultado = this.proxy.enviarPeticion(url, metodo, null, null);
+		if (!resultado.equals("error")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	/**
 	 * Memberships list of a User
@@ -1078,6 +1096,19 @@ public class BonitaApi implements java.io.Serializable {
 		}
 	}
 
+	/**
+	 * Case Variable
+	 * 
+	 * @return
+	 */
+	public Variable caseVariable(long id, String nombre) {
+		String url = "API/bpm/caseVariable/" + Long.toString(id) + "/" + nombre;
+		String metodo = "GET";
+		String resultado = this.proxy.enviarPeticion(url, metodo, null, null);
+
+		return this.mapearVariable(resultado, true);
+	}
+	
 	/**
 	 * Paged Archived Cases list of a User
 	 * 
@@ -1824,6 +1855,21 @@ public class BonitaApi implements java.io.Serializable {
 						"processDefinitionId").toString()));
 			}
 			return caso;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	private Variable mapearVariable(String jsonString, Boolean completeJson) {
+		try {
+			JSONParser par = new JSONParser();
+			JSONObject json = (JSONObject) par.parse(jsonString);
+
+			Variable variable = new Variable();
+			variable.setName((String) json.get("name"));
+			variable.setValue((String) json.get("value"));
+			return variable;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

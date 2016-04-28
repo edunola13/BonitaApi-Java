@@ -11,6 +11,9 @@
  //User user= con.user("compras");
  //List<bonitaClass.Process> precesos= con.deployedProccessForUser(con.actualUser().getId()); %>
  <%= con.getCorrectLogin()%>
+ 
+<%--  <%= con.removeMembership(106L, 1L, 2L) %> --%>
+ 
 <%--  <%for ( bonitaClass.Process preceso : precesos ) { %> --%>
 <%-- 	<%=preceso.getVersion() %> --%>
 <%-- 	<%=preceso.getName() %> --%>

@@ -4,6 +4,10 @@ public class Variable {
 	protected String name;
 	protected String value;
 	
+	public Variable(){
+		
+	}
+	
 	public Variable(String name, String value){
 		this.name= name;
 		this.value= value;
